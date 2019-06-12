@@ -3,40 +3,10 @@ var div_resultado = document.querySelector('#resultado_busqueda')
 var search = document.getElementById('search_bar');
 
 async function load(index){
-  var name_info = document.querySelector('#name_info');
   const query_c = `{
-    film(filmID:`+ index +` ) {
-      id
-      title
-      episodeID
-      openingCrawl
-      director
-      producers  
-      releaseDate     
-      characterConnection {
-        characters {
-          name
-          mass
-          birthYear
-        }
-      }
-      starshipConnection {
-        edges {
-          node {
-            id
-            name
-            manufacturers
-          }
-        }
-      }
-      speciesConnection {
-        edges {
-          node {
-            id
-            name
-          }
-        }
-      }
+    species(id: `+index+`) {
+      name
+      homeworld
     }
   }`
   await axios({
@@ -51,18 +21,13 @@ async function load(index){
       end = true;
     }
     else{
-      console.log("hola");
       film_response(responseData.data.film);
       species_response(responseData.data.film.speciesConnection.edges);
       draw_table_species();
       vehicle_response(responseData.data.film.starshipConnection.edges);
       draw_table_vehicles();
     }          
-
   });
-  
- 
-
 }
 
 function draw_table_species(){
