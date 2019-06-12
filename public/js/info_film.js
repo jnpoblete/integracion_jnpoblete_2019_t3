@@ -1,44 +1,16 @@
 let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
-var div_resultado = document.querySelector('#resultado_busqueda')
+var div_resultado = document.querySelector('#resultado_busqueda');
+var tabla_info = document.querySelector('#tabla_info');
 var tabla_vehicles = document.querySelector('#tabla_vehicles');
 var tabla_species = document.querySelector('#tabla_species');
 var search = document.getElementById('search_bar');
+var titulo = document.getElementById('title');
 
-async function click_mas(index){
-  var name_info = document.querySelector('#name_info');
+async function load(index){
   const query_c = `{
-    film(filmID:`+ index +` ) {
-      id
-      title
-      episodeID
-      openingCrawl
-      director
-      producers  
-      releaseDate     
-      characterConnection {
-        characters {
-          name
-          mass
-          birthYear
-        }
-      }
-      starshipConnection {
-        edges {
-          node {
-            id
-            name
-            manufacturers
-          }
-        }
-      }
-      speciesConnection {
-        edges {
-          node {
-            id
-            name
-          }
-        }
-      }
+    species(id: `+index+`) {
+      name
+      homeworld
     }
   }`
   await axios({
@@ -49,12 +21,12 @@ async function click_mas(index){
     }
   }).then((response) => {
     var responseData = response.data;
-    console.log(responseData);
     if(responseData.data.film == null){
       end = true;
     }
     else{
-      // film_response(responseData.data.film);
+      console.log("hola");
+      film_response(responseData.data.film);
       species_response(responseData.data.film.speciesConnection.edges);
       draw_table_species();
       vehicle_response(responseData.data.film.starshipConnection.edges);
@@ -94,32 +66,31 @@ function draw_table_vehicles(){
 }
 
 
-
-async function film_response(result){
+async function draw_table_info(name, value){
   try{
-    var row = tabla.insertRow(0);
-    // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+
+    var row = tabla_info.insertRow(0);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-
-    // Add some text to the new cells:
-    cell1.innerHTML = result.title;
-    cell2.innerHTML = result.releaseDate;
-    cell3.innerHTML = result.director;
-    cell4.innerHTML = result.producers;
-    cell5.innerHTML = result.episodeID;
-    cell6.innerHTML = "VER MAS";
+    cell1.innerHTML = name;
+    cell2.innerHTML = value;   
   }
   catch(e){
+    console.log(e);
     name.innerText += " "+ e;
-    i = responseData.count + 1;
   }
   
 }
+
+async function film_response(result){
+  draw_table_info("Opening Crawl", result.openingCrawl);
+  draw_table_info("Episode Id", result.episodeID);
+  draw_table_info("Producers", result.producers);
+  draw_table_info("Director", result.director);
+  draw_table_info("Release Date", result.releaseDate);
+  titulo.textContent = result.title;
+}
+
 
 async function species_response(result){
   for(var res in result){
@@ -277,8 +248,31 @@ async function main(){
   search.placeholder="LOADING..."
   search.readOnly = true;
   var index = document.getElementById('id_tag').textContent;
-  await click_mas(index);
+  await load(index);
+  await ver_mas_species();
   search.readOnly = false;
-  search.placeholder="Search.."
+  search.placeholder="Search..";
 }
+
+
+
+async function ver_mas_species(){
+  var index, table = tabla_species;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[2].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/species/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
 main();
+
