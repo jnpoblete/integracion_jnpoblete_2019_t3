@@ -3,6 +3,7 @@ var div_resultado = document.querySelector('#resultado_busqueda');
 var tabla_info = document.querySelector('#tabla_info');
 var tabla_characters = document.querySelector('#tabla_characters');
 var tabla_vehicles = document.querySelector('#tabla_vehicles');
+var tabla_starships = document.querySelector('#tabla_starships');
 var tabla_species = document.querySelector('#tabla_species');
 var search = document.getElementById('search_bar');
 var titulo = document.getElementById('title');
@@ -29,7 +30,7 @@ async function load(index){
           node {
             id
             name
-            manufacturers
+            model
           }
         }
       }
@@ -38,6 +39,15 @@ async function load(index){
           node {
             id
             name
+          }
+        }
+      }
+      vehicleConnection{
+        edges {
+          node {
+            id
+            name    
+            model        
           }
         }
       }
@@ -61,15 +71,17 @@ async function load(index){
       end = true;
     }
     else{
+      console.log(responseData);
       film_response(responseData.data.film);
       species_response(responseData.data.film.speciesConnection.edges);
       draw_table_species();
-      vehicle_response(responseData.data.film.starshipConnection.edges);
+      starships_response(responseData.data.film.starshipConnection.edges);
+      draw_table_starships();
+      vehicles_response(responseData.data.film.vehicleConnection.edges);
       draw_table_vehicles();
       character_response(responseData.data.film.characterConnection.characters);
       draw_table_characters();
-    }          
-
+    }         
   });
 }
 
@@ -81,7 +93,6 @@ function draw_table_characters(){
   var cell2 = row.insertCell(1);
   var cell3 = row.insertCell(2);
   var cell6 = row.insertCell(3);
-
   // Add some text to the new cells:
   cell1.innerHTML = "name";
   cell2.innerHTML = "birth Year";
@@ -101,6 +112,20 @@ function draw_table_species(){
   cell2.innerHTML = "name";
 }
 
+function draw_table_starships(){
+  var row = tabla_starships.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell6 = row.insertCell(3);
+
+  // Add some text to the new cells:
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "name";
+  cell3.innerHTML = "model";
+}
+
 function draw_table_vehicles(){
   var row = tabla_vehicles.insertRow(0);
   // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
@@ -112,7 +137,7 @@ function draw_table_vehicles(){
   // Add some text to the new cells:
   cell1.innerHTML = "id";
   cell2.innerHTML = "name";
-  cell3.innerHTML = "manufacturers";
+  cell3.innerHTML = "model";
 }
 
 
@@ -193,7 +218,29 @@ async function species_response(result){
   
 }
 
-async function vehicle_response(result){
+async function starships_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_starships.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell6 = row.insertCell(3);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].node.id;
+      cell2.innerHTML = result[res].node.name;
+      cell3.innerHTML = result[res].node.model;
+      cell6.innerHTML = "VER MAS";
+    }
+    catch(e){
+      name.innerText += " "+ e;
+    }
+  }
+}
+
+async function vehicles_response(result){
   for(var res in result){
     try{
       var row = tabla_vehicles.insertRow(0);
@@ -206,7 +253,7 @@ async function vehicle_response(result){
       // Add some text to the new cells:
       cell1.innerHTML = result[res].node.id;
       cell2.innerHTML = result[res].node.name;
-      cell3.innerHTML = result[res].node.manufacturers;
+      cell3.innerHTML = result[res].node.model;
       cell6.innerHTML = "VER MAS";
     }
     catch(e){

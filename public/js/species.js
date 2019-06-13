@@ -1,12 +1,34 @@
 let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
+var tabla_info = document.querySelector('#tabla_info');
+var tabla_characters = document.querySelector('#tabla_characters');
+var titulo = document.getElementById('title');
 var div_resultado = document.querySelector('#resultado_busqueda')
 var search = document.getElementById('search_bar');
 
 async function load(index){
+  console.log(index);
   const query_c = `{
-    species(id: `+index+`) {
+    species(id: "`+index+`") {
       name
-      homeworld
+      classification
+      designation
+      averageHeight
+      averageLifespan
+      eyeColors
+      hairColors
+      skinColors
+      language
+      homeworld{
+        id
+        name
+      }
+      personConnection {
+        people{
+          id
+          name
+          birthYear
+        }
+      }
     }
   }`
   await axios({
@@ -17,49 +39,19 @@ async function load(index){
     }
   }).then((response) => {
     var responseData = response.data;
-    if(responseData.data.film == null){
+    if(responseData.data.species == null){
       end = true;
     }
     else{
-      film_response(responseData.data.film);
-      species_response(responseData.data.film.speciesConnection.edges);
-      draw_table_species();
-      vehicle_response(responseData.data.film.starshipConnection.edges);
-      draw_table_vehicles();
+      species_response(responseData.data.species);
+      character_response(responseData.data.species.personConnection.people);
+      draw_table_characters();
     }          
   });
 }
 
-function draw_table_species(){
-  var row = tabla_species.insertRow(0);
-  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  var cell6 = row.insertCell(2);
-
-  // Add some text to the new cells:
-  cell1.innerHTML = "id";
-  cell2.innerHTML = "name";
-}
-
-function draw_table_vehicles(){
-  var row = tabla_vehicles.insertRow(0);
-  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  var cell3 = row.insertCell(2);
-  var cell6 = row.insertCell(3);
-
-  // Add some text to the new cells:
-  cell1.innerHTML = "id";
-  cell2.innerHTML = "name";
-  cell3.innerHTML = "manufacturers";
-}
-
-
 async function draw_table_info(name, value){
   try{
-
     var row = tabla_info.insertRow(0);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
@@ -73,29 +65,39 @@ async function draw_table_info(name, value){
   
 }
 
-async function film_response(result){
-  draw_table_info("Opening Crawl", result.openingCrawl);
-  draw_table_info("Episode Id", result.episodeID);
-  draw_table_info("Producers", result.producers);
-  draw_table_info("Director", result.director);
-  draw_table_info("Release Date", result.releaseDate);
-  titulo.textContent = result.title;
+function draw_table_characters(){
+  var row = tabla_characters.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell6 = row.insertCell(3);
+  // Add some text to the new cells:
+  cell1.innerHTML = "name";
+  cell2.innerHTML = "birth Year";
+  cell3.innerHTML = "mass";
 }
 
-
-async function species_response(result){
+async function character_response(result){
   for(var res in result){
     try{
-      var row = tabla_species.insertRow(0);
+      var row = tabla_characters.insertRow(0);
       // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
-      var cell6 = row.insertCell(2);
+      var cell3 = row.insertCell(2);
+      var cell6 = row.insertCell(3);
 
       // Add some text to the new cells:
       
-      cell1.innerHTML = result[res].node.id;
-      cell2.innerHTML = result[res].node.name;
+      cell1.innerHTML = result[res].name;
+      cell2.innerHTML = result[res].birthYear;
+      if(result[res].mass == null){
+        cell3.innerHTML = "unknown";
+      }
+      else{
+        cell3.innerHTML = result[res].mass;
+      }
       cell6.innerHTML = "VER MAS";
     }
     catch(e){
@@ -105,35 +107,25 @@ async function species_response(result){
   
 }
 
-async function vehicle_response(result){
-  for(var res in result){
-    try{
-      var row = tabla_vehicles.insertRow(0);
-      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell6 = row.insertCell(3);
-
-      // Add some text to the new cells:
-      cell1.innerHTML = result[res].node.id;
-      cell2.innerHTML = result[res].node.name;
-      cell3.innerHTML = result[res].node.manufacturers;
-      cell6.innerHTML = "VER MAS";
-    }
-    catch(e){
-      name.innerText += " "+ e;
-    }
-  }
+async function species_response(result){
+  draw_table_info("Classification", result.classification);
+  draw_table_info("Designation", result.designation);
+  draw_table_info("AverageHeight", result.averageHeight);
+  draw_table_info("AverageLifespan", result.averageLifespan);
+  draw_table_info("eyeColors", result.eyeColors);
+  draw_table_info("hairColors", result.hairColors);
+  draw_table_info("skinColors", result.skinColors);
+  draw_table_info("language", result.language);
+  draw_table_info("homeworld", result.homeworld.name);
+  titulo.textContent = result.name;
 }
-
 
 
 async function main(){
   search.placeholder="LOADING..."
   search.readOnly = true;
-  var index = document.getElementById('id_tag').textContent;
-  await click_mas(index);
+  var index = document.getElementById('url_tag').textContent;
+  await load(index);
   search.readOnly = false;
   search.placeholder="Search..";
 }
