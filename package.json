@@ -8,8 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node test.js",
-    "build": "browserify /home/maifren/Documentos/2019-1/Integracion/T3/jnpoblete-integracion-2019-github/public/js/app.js -o bundle.js"
+    "test": "node test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
