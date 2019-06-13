@@ -26,5 +26,8 @@ express()
   .get('/vehicles/:url', function(req, res){
     res.render('pages/vehicles', {url:req.params.url})
   })
+  .get('/people/:url', function(req, res){
+    res.render('pages/people', {url:req.params.url})
+  })
 
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))

@@ -65,6 +65,19 @@ async function draw_table_info(name, value){
   
 }
 
+async function species_response(result){
+  draw_table_info("Classification", result.classification);
+  draw_table_info("Designation", result.designation);
+  draw_table_info("AverageHeight", result.averageHeight);
+  draw_table_info("AverageLifespan", result.averageLifespan);
+  draw_table_info("eyeColors", result.eyeColors);
+  draw_table_info("hairColors", result.hairColors);
+  draw_table_info("skinColors", result.skinColors);
+  draw_table_info("language", result.language);
+  draw_table_info("homeworld", result.homeworld.name);
+  titulo.textContent = result.name;
+}
+
 function draw_table_characters(){
   var row = tabla_characters.insertRow(0);
   // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
@@ -107,18 +120,7 @@ async function character_response(result){
   
 }
 
-async function species_response(result){
-  draw_table_info("Classification", result.classification);
-  draw_table_info("Designation", result.designation);
-  draw_table_info("AverageHeight", result.averageHeight);
-  draw_table_info("AverageLifespan", result.averageLifespan);
-  draw_table_info("eyeColors", result.eyeColors);
-  draw_table_info("hairColors", result.hairColors);
-  draw_table_info("skinColors", result.skinColors);
-  draw_table_info("language", result.language);
-  draw_table_info("homeworld", result.homeworld.name);
-  titulo.textContent = result.name;
-}
+
 
 
 async function main(){

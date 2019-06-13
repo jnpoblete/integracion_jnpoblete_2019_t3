@@ -1,7 +1,8 @@
-let apiUrl_Resto = 'https://swapi.co/api/';
-let apiUrlFilms = 'https://swapi.co/api/films/';
+let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
 var div_resultado = document.querySelector('#resultado_busqueda')
+var tabla_info = document.querySelector('#tabla_info');
 var search = document.getElementById('search_bar');
+var titulo = document.getElementById('title');
 
 async function fun(index){
   r = await axios.get(apiUrl_Resto+ "people/"+ index).then(response =>{
@@ -146,29 +147,74 @@ async function buscador(){
   }
 }
 
-
-async function load(url, text, parametro){
-  r = await axios.get(url).then(response =>{
-    return response.data.results;
-  });
-  for(var i  = 0; i < r.length; i++)
-  {
-    if(parametro == "info_films"){
-      var B = r[i].title.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].title, r[i].url];
+async function load(index){
+  console.log(index);
+  const query_c = `{
+    person(id: "`+index+`") {
+      name
+      birthYear
+      eyeColor
+      gender
+      hairColor
+      height
+      mass
+      skinColor
+      species{
+        id
+        name
       }
-    }
-    else{
-      var B = r[i].name.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].name, r[i].url];
+      homeworld {
+        id
+        name
       }
     }
   }
-    return ["BUSQUEDA NO ENCONTRADA", ""];
+  `
+  await axios({
+    url: apiUrl,
+    method: 'post',
+    data: {
+      query: query_c
+    }
+  }).then((response) => {
+    console.log(response);
+    var responseData = response.data;
+    if(responseData.data.person == null){
+      end = true;
+    }
+    else{
+      people_response(responseData.data.person);
+    }          
+  });
 }
 
+async function draw_table_info(name, value){
+  try{
+    var row = tabla_info.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.innerHTML = name;
+    cell2.innerHTML = value;   
+  }
+  catch(e){
+    console.log(e);
+    name.innerText += " "+ e;
+  }
+  
+}
+
+async function people_response(result){
+  draw_table_info("Birth Year", result.birthYear);
+  draw_table_info("eye Color", result.eyeColor);
+  draw_table_info("gender", result.gender);
+  draw_table_info("hair Color", result.hairColor);
+  draw_table_info("height", result.height);
+  draw_table_info("mass", result.mass);
+  draw_table_info("skin Color", result.skinColor);
+  draw_table_info("specie", result.species.name);
+  draw_table_info("homeworld", result.homeworld.name);
+  titulo.textContent = result.name;
+}
 
 
 
@@ -176,7 +222,7 @@ async function main(){
   var index = document.getElementById('url_tag').textContent;
   search.placeholder="LOADING..."
   search.readOnly = true;
-  await fun(index);
+  await load(index);
   search.readOnly = false;
   search.placeholder="Search.."
 
