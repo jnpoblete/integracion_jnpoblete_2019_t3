@@ -1,7 +1,9 @@
-let apiUrl_Resto = 'https://swapi.co/api/';
-let apiUrlFilms = 'https://swapi.co/api/films/';
+let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
 var div_resultado = document.querySelector('#resultado_busqueda')
 var search = document.getElementById('search_bar');
+var tabla_info = document.querySelector('#tabla_info');
+var tabla_films = document.querySelector('#tabla_films');
+var titulo = document.getElementById('title');
 
 async function fun(index){
   r = await axios.get(apiUrl_Resto+ "starships/"+ index).then(response =>{
@@ -139,36 +141,124 @@ async function buscador(){
 }
 
 
-async function load(url, text, parametro){
-  r = await axios.get(url).then(response =>{
-    return response.data.results;
-  });
-  for(var i  = 0; i < r.length; i++)
-  {
-    if(parametro == "info_films"){
-      var B = r[i].title.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].title, r[i].url];
+async function load(index){
+  console.log(index);
+  const query_c = `{
+    starship(id: "`+index+`") {
+      name
+      model
+      starshipClass
+      manufacturers
+      costInCredits
+      length
+      crew
+      passengers
+      maxAtmospheringSpeed
+      hyperdriveRating
+      MGLT
+      cargoCapacity
+      consumables
+      pilotConnection{
+        pilots{
+          id
+          name
+        }
       }
+      filmConnection{
+        films{
+          id
+          title
+        }
+      }
+    }
+  }`
+  await axios({
+    url: apiUrl,
+    method: 'post',
+    data: {
+      query: query_c
+    }
+  }).then((response) => {
+    console.log(response);
+    var responseData = response.data;
+    if(responseData.data.starship == null){
+      end = true;
     }
     else{
-      var B = r[i].name.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].name, r[i].url];
-      }
-    }
-  }
-    return ["BUSQUEDA NO ENCONTRADA", ""];
+      starships_response(responseData.data.starship);
+      film_response(responseData.data.starship.filmConnection.films);
+      draw_table_films();
+    }          
+  });
 }
 
+async function draw_table_info(name, value){
+  try{
+    var row = tabla_info.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.innerHTML = name;
+    cell2.innerHTML = value;   
+  }
+  catch(e){
+    console.log(e);
+    name.innerText += " "+ e;
+  }
+  
+}
 
+function draw_table_films(){
+  var row = tabla_films.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell6 = row.insertCell(1);
+
+  // Add some text to the new cells:
+  cell1.innerHTML = "title";
+}
+
+async function film_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_films.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell6 = row.insertCell(1);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].title;
+      cell6.innerHTML = "VER MAS";
+    }
+    catch(e){
+      name.innerText += " "+ e;
+    }
+  }
+    
+}
+
+async function starships_response(result){
+  draw_table_info("consumables", result.consumables);
+  draw_table_info("cargoCapacity", result.cargoCapacity);
+  draw_table_info("MGLT", result.MGLT);
+  draw_table_info("hyperdriveRating", result.hyperdriveRating);
+  draw_table_info("maxAtmospheringSpeed", result.maxAtmospheringSpeed);
+  draw_table_info("passengers", result.passengers);
+  draw_table_info("crew", result.crew);
+  draw_table_info("length", result.length);
+  draw_table_info("costInCredits", result.costInCredits);
+  draw_table_info("manufacturers", result.manufacturers);
+  draw_table_info("starshipClass", result.starshipClass);
+  draw_table_info("model", result.model);
+  titulo.textContent = result.name;
+}
 
 async function main(){
   var index = document.getElementById('url_tag').textContent;
   search.placeholder="LOADING..."
   search.readOnly = true;
-  await fun(index);
+  await load(index);
   search.readOnly = false;
   search.placeholder="Search.."
+
 }
 main();

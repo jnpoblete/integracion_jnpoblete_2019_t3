@@ -1,8 +1,9 @@
 let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
 var div_resultado = document.querySelector('#resultado_busqueda')
 var tabla_info = document.querySelector('#tabla_info');
-var search = document.getElementById('search_bar');
 var titulo = document.getElementById('title');
+var search = document.getElementById('search_bar');
+
 
 async function fun(index){
   r = await axios.get(apiUrl_Resto+ "people/"+ index).then(response =>{

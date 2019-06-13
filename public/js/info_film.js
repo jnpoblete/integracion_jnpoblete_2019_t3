@@ -273,6 +273,9 @@ async function main(){
   var index = document.getElementById('id_tag').textContent;
   await load(index);
   await ver_mas_species();
+  await ver_mas_characters();
+  await ver_mas_starships();
+  await ver_mas_vehicles();
   search.readOnly = false;
   search.placeholder="Search..";
 }
@@ -298,7 +301,7 @@ async function ver_mas_species(){
 }
 
 
-async function ver_mas_species(){
+async function ver_mas_characters(){
   var index, table = tabla_characters;
   for(var i  = 0; i < table.rows.length; i++){
     try{
@@ -315,6 +318,44 @@ async function ver_mas_species(){
 
   }
 }
+
+async function ver_mas_starships(){
+  var index, table = tabla_starships;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[3].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/starships/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
+
+async function ver_mas_vehicles(){
+  var index, table = tabla_vehicles;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[3].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/vehicles/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
 
 main();
 
