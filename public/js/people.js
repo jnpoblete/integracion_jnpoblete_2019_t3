@@ -3,6 +3,7 @@ var div_resultado = document.querySelector('#resultado_busqueda')
 var tabla_info = document.querySelector('#tabla_info');
 var titulo = document.getElementById('title');
 var search = document.getElementById('search_bar');
+var tabla_films = document.querySelector('#tabla_films');
 
 
 async function fun(index){
@@ -168,6 +169,12 @@ async function load(index){
         id
         name
       }
+      filmConnection{
+        films{
+          id
+          title
+        }
+      }
     }
   }
   `
@@ -178,18 +185,59 @@ async function load(index){
       query: query_c
     }
   }).then((response) => {
-    console.log(response);
+    
     var responseData = response.data;
     if(responseData.data.person == null){
       end = true;
     }
     else{
       people_response(responseData.data.person);
-      add_hyperlink(1, 1, "/species/" + responseData.data.person.species.id)
+      console.log(responseData.data.person);
+      if(responseData.data.person.species){
+        add_hyperlink(1, 1, "/species/" + responseData.data.person.species.id)
+      }
+      if(responseData.data.person.homeworld){
       add_hyperlink(0, 1, "/planets/" + responseData.data.person.homeworld.id)
+      }
+      film_response(responseData.data.person.filmConnection.films);
+      draw_table_films();
     }          
   });
 }
+
+function draw_table_films(){
+  var row = tabla_films.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell6 = row.insertCell(2);
+
+  // Add some text to the new cells:
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "title";
+}
+
+async function film_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_films.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell6 = row.insertCell(2);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].id;
+      cell2.innerHTML = result[res].title;
+      cell6.innerHTML = "VER MAS";
+    }
+    catch(e){
+      name.innerText += " "+ e;
+    }
+  }
+    
+}
+
 
 async function draw_table_info(name, value){
   try{
@@ -214,8 +262,18 @@ async function people_response(result){
   draw_table_info("height", result.height);
   draw_table_info("mass", result.mass);
   draw_table_info("skin Color", result.skinColor);
+  if(result.species){
   draw_table_info("specie", result.species.name);
-  draw_table_info("homeworld", result.homeworld.name);
+  }
+  else{
+    draw_table_info("specie", "null");
+  }
+  if(result.homeworld){
+    draw_table_info("homeworld", result.homeworld.name);
+  }
+  else{
+    draw_table_info("homeworld", "null");
+  }
   titulo.textContent = result.name;
 }
 
@@ -235,11 +293,30 @@ async function add_hyperlink(row, col, url){
   }
 }
 
+async function ver_mas_films(){
+  var index, table = tabla_films;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[2].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/info_films/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
 async function main(){
   var index = document.getElementById('url_tag').textContent;
   search.placeholder="LOADING..."
   search.readOnly = true;
   await load(index);
+  await ver_mas_films();
   search.readOnly = false;
   search.placeholder="Search.."
 

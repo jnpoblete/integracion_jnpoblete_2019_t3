@@ -18,6 +18,13 @@
     tr:nth-child(even) {
       background-color: #dddddd;
     }
+    #tabla_characters td:nth-child(1){
+      display: none;
+    }
+    #tabla_films td:nth-child(1){
+      display: none;
+    }
+
   </style>
 </head>
 
@@ -31,9 +38,17 @@
   <h1 id="url_tag" visibility: hidden><%= url %></h1>
 
 
+  <h1 id="title"></h1>
+  <table id="tabla_info">
+  </table>
 
+  <h1>Characters</h1>
+  <table id="tabla_characters">
+  </table>
 
-
+  <h1>Films donde aparece</h1>
+  <table id="tabla_films">
+  </table>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
   <script type="text/javascript" src="../js/planets.js"></script>
