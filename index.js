@@ -8,8 +8,8 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
-  .get('/info_films/:id', function(req, res){
-    res.render('pages/info_films', {id:req.params.id})
+  .get('/info_films/:url', function(req, res){
+    res.render('pages/info_films', {url:req.params.url})
   })
   .get('/characters/:url', function(req, res){
     res.render('pages/people', {url:req.params.url})

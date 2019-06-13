@@ -1,179 +1,154 @@
-let apiUrl_Resto = 'https://swapi.co/api/';
-let apiUrlFilms = 'https://swapi.co/api/films/';
+let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
+var tabla_info = document.querySelector('#tabla_info');
+var tabla_characters = document.querySelector('#tabla_characters');
+var titulo = document.getElementById('title');
 var div_resultado = document.querySelector('#resultado_busqueda')
 var search = document.getElementById('search_bar');
 
-async function fun(index){
-  r = await axios.get(apiUrl_Resto+ "planets/"+ index + "/").then(response =>{
-    ret = response.data;
-    return ret;
-  });
-
-    for(var k in r){
-      if(k == "residents" || k=="films"){
-        var a = r[k].toString();
-        var aux = a.split(",")
-        var res = "";
-        console.log(aux);
-        var h1 = document.createElement("H1");
-        var c1 = document.createTextNode(k + ":");
-        h1.appendChild(c1);
-        document.body.appendChild(h1);
-        for (i = 0; i <aux.length; i++){
-          var m = await filtrar(aux[i], k);
-          t = m[0];
-          url = m[1];
-          var a = document.createElement("a");
-          var c = document.createTextNode(t + "\n");
-          a.appendChild(c);
-          a.title  = t;
-          aux2 = url.toString().split("/");
-          if(k == "films"){
-              a.href = "/info_films/" + aux2[aux2.length-2];
-          }
-          else{
-            a.href = "/characters/" + aux2[aux2.length-2];
-          }
-          document.body.appendChild(a);
-
-          var h3 = document.createElement("H1");
-          var c3 = document.createTextNode("");
-          h3.appendChild(c3);
-          document.body.appendChild(h3);
+async function load(index){
+  console.log(index);
+  const query_c = `{
+    species(id: "`+index+`") {
+      name
+      classification
+      designation
+      averageHeight
+      averageLifespan
+      eyeColors
+      hairColors
+      skinColors
+      language
+      homeworld{
+        id
+        name
+      }
+      personConnection {
+        people{
+          id
+          name
+          birthYear
         }
-
-        console.log(k + " LISTOS");
-
-      }
-      else if (k == "vehicles" || k == "starships" || k=="url"){
-
-      }
-      else{
-          name_info.innerHTML += "<br><br>" + k + ": " +r[k];
-      }
-  }
-}
-
-
-async function filtrar(parametro, film){
-  aux = await axios.get(parametro).then(response =>{
-    var res = "";
-    var url = "";
-      r2 = response.data;
-      try{
-        if(film != "films"){
-          res += r2.name + " ";
-        }
-      else{
-        res += r2.title + " ";
-      }
-        url = r2.url;
-      }
-      catch(e){
-        console.log(e);
-      }
-      return [res, url];
-    });
-    ret2 = aux[0];
-    url2 = aux[1];
-    return [ret2, url2];
-}
-
-
-async function buscador(){
-  var text = document.getElementById('search_bar').value;
-  while (div_resultado.firstChild) {
-    div_resultado.removeChild(div_resultado.firstChild);
-  }
-  var casos = ["info_films", "characters", "starships", "planets"]
-  var url = ""
-  var resultado = "";
-  //name, title
-  for(var i  = 0; i < casos.length; i++)
-  {
-
-    if(casos[i] == "info_films")
-    {
-      url = apiUrlFilms;
-    }
-    else
-    {
-      if(casos[i] == "characters"){
-        url = apiUrl_Resto + "people";
-      }
-      else{
-        url = apiUrl_Resto + casos[i];
       }
     }
-    if(text != ""){
-      resp = await load(url,text, casos[i]);
-      t = resp[0];
-      url = resp[1];
-      console.log(t);
-      console.log(url);
-      if(url != ""){
-        var a = document.createElement("a");
-        var c = document.createTextNode(t + "\n");
-        a.appendChild(c);
-        a.title  = t;
-        aux2 = url.toString().split("/");
-        a.href = "/"+ casos[i] + "/" + aux2[aux2.length-2];
-        if(resultado == ""){
-          var h3 = document.createElement("H3");
-          var c3 = document.createTextNode("RESULTADOS DE LA BUSQUEDA: '" + text + "'");
-          h3.appendChild(c3);
-          div_resultado.appendChild(h3);
-        }
-        resultado = "encontrado";
-        div_resultado.appendChild(a);
-        var h3 = document.createElement("H1");
-        var c3 = document.createTextNode("");
-        h3.appendChild(c3);
-        div_resultado.appendChild(h3);
-      }
+  }`
+  await axios({
+    url: apiUrl,
+    method: 'post',
+    data: {
+      query: query_c
+    }
+  }).then((response) => {
+    var responseData = response.data;
+    if(responseData.data.species == null){
+      end = true;
     }
     else{
-      t = "SIN RESULTADOS";
-    }
-  }
-  if(resultado == ""){
-    var h3 = document.createElement("H1");
-    var c3 = document.createTextNode(t);
-    h3.appendChild(c3);
-    div_resultado.appendChild(h3);
-  }
-}
-
-async function load(url, text, parametro){
-  r = await axios.get(url).then(response =>{
-    return response.data.results;
+      species_response(responseData.data.species);
+      character_response(responseData.data.species.personConnection.people);
+      draw_table_characters();
+    }          
   });
-  for(var i  = 0; i < r.length; i++)
-  {
-    if(parametro == "info_films"){
-      var B = r[i].title.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].title, r[i].url];
+}
+
+async function draw_table_info(name, value){
+  try{
+    var row = tabla_info.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.innerHTML = name;
+    cell2.innerHTML = value;   
+  }
+  catch(e){
+    console.log(e);
+    name.innerText += " "+ e;
+  }
+  
+}
+
+async function species_response(result){
+  draw_table_info("Classification", result.classification);
+  draw_table_info("Designation", result.designation);
+  draw_table_info("AverageHeight", result.averageHeight);
+  draw_table_info("AverageLifespan", result.averageLifespan);
+  draw_table_info("eyeColors", result.eyeColors);
+  draw_table_info("hairColors", result.hairColors);
+  draw_table_info("skinColors", result.skinColors);
+  draw_table_info("language", result.language);
+  draw_table_info("homeworld", result.homeworld.name);
+  titulo.textContent = result.name;
+}
+
+function draw_table_characters(){
+  var row = tabla_characters.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell4 = row.insertCell(3);
+  var cell6 = row.insertCell(4);
+  // Add some text to the new cells:
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "name";
+  cell3.innerHTML = "birth Year";
+  cell4.innerHTML = "mass";
+}
+
+async function character_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_characters.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+      var cell6 = row.insertCell(4);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].id;
+      cell2.innerHTML = result[res].name;
+      cell3.innerHTML = result[res].birthYear;
+      if(result[res].mass == null){
+        cell4.innerHTML = "unknown";
       }
+      else{
+        cell4.innerHTML = result[res].mass;
+      }
+      cell6.innerHTML = "VER MAS";
     }
-    else{
-      var B = r[i].name.toString().toUpperCase();
-      if ( B.split(text.toUpperCase()).length  >= 2) {
-        return [r[i].name, r[i].url];
-      }
+    catch(e){
+      name.innerText += " "+ e;
     }
   }
-    return ["BUSQUEDA NO ENCONTRADA", ""];
+  
 }
 
 
+async function ver_mas_people(){
+  var index, table = tabla_characters;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[4].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/people/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
 
 async function main(){
-  var index = document.getElementById('url_tag').textContent;
   search.placeholder="LOADING..."
   search.readOnly = true;
-  await fun(index);
+  var index = document.getElementById('url_tag').textContent;
+  await load(index);
+  await ver_mas_people();
   search.readOnly = false;
-  search.placeholder="Search.."
+  search.placeholder="Search..";
 }
 main();

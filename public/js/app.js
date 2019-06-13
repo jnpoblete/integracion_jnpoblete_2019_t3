@@ -105,13 +105,15 @@ function draw_table(){
   var cell4 = row.insertCell(3);
   var cell5 = row.insertCell(4);
   var cell6 = row.insertCell(5);
+  var cell7 = row.insertCell(6);
 
   // Add some text to the new cells:
-  cell1.innerHTML = "title";
-  cell2.innerHTML = "release_date";
-  cell3.innerHTML = "director";
-  cell4.innerHTML = "producers";
-  cell5.innerHTML = "episode_id";
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "title";
+  cell3.innerHTML = "release_date";
+  cell4.innerHTML = "director";
+  cell5.innerHTML = "producers";
+  cell6.innerHTML = "episode_id";
 }
 
 async function film_response(result){
@@ -124,14 +126,16 @@ async function film_response(result){
       var cell4 = row.insertCell(3);
       var cell5 = row.insertCell(4);
       var cell6 = row.insertCell(5);
+      var cell7 = row.insertCell(6);
 
       // Add some text to the new cells:
-      cell1.innerHTML = result.title;
-      cell2.innerHTML = result.releaseDate;
-      cell3.innerHTML = result.director;
-      cell4.innerHTML = result.producers;
-      cell5.innerHTML = result.episodeID;
-      cell6.innerHTML = "VER MAS";
+      cell1.innerHTML = result.id;
+      cell2.innerHTML = result.title;
+      cell3.innerHTML = result.releaseDate;
+      cell4.innerHTML = result.director;
+      cell5.innerHTML = result.producers;
+      cell6.innerHTML = result.episodeID;
+      cell7.innerHTML = "VER MAS";
     }
     catch(e){
       name.innerText += " "+ e;
@@ -147,30 +151,49 @@ function updateInfoError(e){
 
 
 
+async function ver_mas_films(){
+  var index, table = tabla;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[6].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/info_films/" + index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
 async function main(){
   search.placeholder="LOADING..."
   search.readOnly = true;
   await show_all_films();
-  var index, table = document.getElementById('tabla_resultados');
-  console.log(table.rows.length);
-  for(var i  = 0; i < table.rows.length; i++){
-    table.rows[i].cells[5].onclick = function(){
-      index = this.parentElement.rowIndex;
-      index = parseInt(table.rows[index].cells[4].innerHTML, 10);
-      if(index < 4){
-        index =index + 3;
-      }
-      else if(index == 7){
+  // var index, table = document.getElementById('tabla_resultados');
+  // console.log(table.rows.length);
+  // for(var i  = 0; i < table.rows.length; i++){
+  //   table.rows[i].cells[5].onclick = function(){
+  //     index = this.parentElement.rowIndex;
+  //     index = parseInt(table.rows[index].cells[4].innerHTML, 10);
+  //     if(index < 4){
+  //       index =index + 3;
+  //     }
+  //     else if(index == 7){
 
-      }
-      else{
-        index = index - 3;
-      }
-      console.log(index);
-      window.location = "/info_films/" +index;
-    };
+  //     }
+  //     else{
+  //       index = index - 3;
+  //     }
+  //     console.log(index);
+  //     window.location = "/info_films/" +index;
+  //   };
 
-  }
+  // }
+  await ver_mas_films();
   search.readOnly = false;
   search.placeholder="Search..";
 

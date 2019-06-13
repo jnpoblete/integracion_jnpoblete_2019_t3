@@ -185,6 +185,8 @@ async function load(index){
     }
     else{
       people_response(responseData.data.person);
+      add_hyperlink(1, 1, "/species/" + responseData.data.person.species.id)
+      add_hyperlink(0, 1, "/planets/" + responseData.data.person.homeworld.id)
     }          
   });
 }
@@ -217,7 +219,21 @@ async function people_response(result){
   titulo.textContent = result.name;
 }
 
-
+async function add_hyperlink(row, col, url){
+  var table = tabla_info;
+  var value =  table.rows[row].cells[col].textContent;
+  table.rows[row].cells[col].textContent = "";
+  try{
+    var link = document.createElement("a");
+    link.setAttribute("href", url)
+    var linkText = document.createTextNode(value);
+    link.appendChild(linkText);
+    table.rows[row].cells[col].appendChild(link); 
+  }
+  catch(e){
+    console.log(e);
+  }
+}
 
 async function main(){
   var index = document.getElementById('url_tag').textContent;

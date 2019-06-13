@@ -9,8 +9,9 @@ var search = document.getElementById('search_bar');
 var titulo = document.getElementById('title');
 
 async function load(index){
+  console.log(index)
   const query_c = `{
-    film(filmID:`+ index +` ) {
+    film(id:"`+ index +`" ) {
       id
       title
       episodeID
@@ -267,19 +268,6 @@ async function vehicles_response(result){
 }
 
 
-async function main(){
-  search.placeholder="LOADING..."
-  search.readOnly = true;
-  var index = document.getElementById('id_tag').textContent;
-  await load(index);
-  await ver_mas_species();
-  await ver_mas_characters();
-  await ver_mas_starships();
-  await ver_mas_vehicles();
-  search.readOnly = false;
-  search.placeholder="Search..";
-}
-
 
 
 async function ver_mas_species(){
@@ -356,6 +344,18 @@ async function ver_mas_vehicles(){
   }
 }
 
+async function main(){
+  search.placeholder="LOADING..."
+  search.readOnly = true;
+  var index = document.getElementById('url_tag').textContent;
+  await load(index);
+  await ver_mas_species();
+  await ver_mas_characters();
+  await ver_mas_starships();
+  await ver_mas_vehicles();
+  search.readOnly = false;
+  search.placeholder="Search..";
+}
 
 main();
 

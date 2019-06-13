@@ -84,11 +84,13 @@ function draw_table_characters(){
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
   var cell3 = row.insertCell(2);
-  var cell6 = row.insertCell(3);
+  var cell4 = row.insertCell(3);
+  var cell6 = row.insertCell(4);
   // Add some text to the new cells:
-  cell1.innerHTML = "name";
-  cell2.innerHTML = "birth Year";
-  cell3.innerHTML = "mass";
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "name";
+  cell3.innerHTML = "birth Year";
+  cell4.innerHTML = "mass";
 }
 
 async function character_response(result){
@@ -99,17 +101,18 @@ async function character_response(result){
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
-      var cell6 = row.insertCell(3);
+      var cell4 = row.insertCell(3);
+      var cell6 = row.insertCell(4);
 
       // Add some text to the new cells:
-      
-      cell1.innerHTML = result[res].name;
-      cell2.innerHTML = result[res].birthYear;
+      cell1.innerHTML = result[res].id;
+      cell2.innerHTML = result[res].name;
+      cell3.innerHTML = result[res].birthYear;
       if(result[res].mass == null){
-        cell3.innerHTML = "unknown";
+        cell4.innerHTML = "unknown";
       }
       else{
-        cell3.innerHTML = result[res].mass;
+        cell4.innerHTML = result[res].mass;
       }
       cell6.innerHTML = "VER MAS";
     }
@@ -121,13 +124,30 @@ async function character_response(result){
 }
 
 
+async function ver_mas_people(){
+  var index, table = tabla_characters;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[4].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/people/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
 
+  }
+}
 
 async function main(){
   search.placeholder="LOADING..."
   search.readOnly = true;
   var index = document.getElementById('url_tag').textContent;
   await load(index);
+  await ver_mas_people();
   search.readOnly = false;
   search.placeholder="Search..";
 }
