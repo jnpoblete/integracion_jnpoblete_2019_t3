@@ -175,6 +175,12 @@ async function load(index){
           title
         }
       }
+      filmConnection{
+        films{
+          id
+          title
+        }
+      }
     }
   }
   `

@@ -195,6 +195,8 @@ async function load(index){
       vehicle_response(responseData.data.vehicle);
       film_response(responseData.data.vehicle.filmConnection.films);
       draw_table_films();
+      pilot_response(responseData.data.vehicle.pilotConnection.pilots);
+      draw_table_pilots();
     }          
   });
 }
@@ -225,6 +227,40 @@ function draw_table_films(){
   cell1.innerHTML = "id";
   cell2.innerHTML = "tite";
 }
+
+function draw_table_pilots(){
+  var row = tabla_pilotos.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell6 = row.insertCell(2);
+
+  // Add some text to the new cells:
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "name";
+}
+
+async function pilot_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_pilotos.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell6 = row.insertCell(2);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].id;
+      cell2.innerHTML = result[res].name;
+      cell6.innerHTML = "VER MAS";
+    }
+    catch(e){
+      name.innerText += " "+ e;
+    }
+  }
+    
+}
+
 
 async function film_response(result){
   for(var res in result){
@@ -261,16 +297,7 @@ async function vehicle_response(result){
   titulo.textContent = result.name;
 }
 
-async function main(){
-  var index = document.getElementById('url_tag').textContent;
-  search.placeholder="LOADING..."
-  search.readOnly = true;
-  await load(index);
-  await ver_mas_films();
-  search.readOnly = false;
-  search.placeholder="Search.."
 
-}
 
 async function ver_mas_films(){
   var index, table = tabla_films;
@@ -288,5 +315,35 @@ async function ver_mas_films(){
     }
 
   }
+}
+
+async function ver_mas_pilotos(){
+  var index, table = tabla_pilotos;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[2].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/people/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
+async function main(){
+  var index = document.getElementById('url_tag').textContent;
+  search.placeholder="LOADING..."
+  search.readOnly = true;
+  await load(index);
+  await ver_mas_films();
+  await ver_mas_pilotos();
+  search.readOnly = false;
+  search.placeholder="Search.."
+
 }
 main();

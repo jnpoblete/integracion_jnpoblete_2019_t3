@@ -2,6 +2,7 @@ let apiUrl = 'https://swapi-graphql-integracion-t3.herokuapp.com';
 var div_resultado = document.querySelector('#resultado_busqueda');
 var tabla_info = document.querySelector('#tabla_info');
 var tabla_characters = document.querySelector('#tabla_characters');
+var tabla_planets = document.querySelector('#tabla_planets');
 var tabla_vehicles = document.querySelector('#tabla_vehicles');
 var tabla_starships = document.querySelector('#tabla_starships');
 var tabla_species = document.querySelector('#tabla_species');
@@ -53,6 +54,14 @@ async function load(index){
           }
         }
       }
+      planetConnection{
+        edges {
+          node {
+            id
+            name           
+          }
+        }
+      }
     }
   }`
   // const query_c = `{
@@ -83,6 +92,8 @@ async function load(index){
       draw_table_vehicles();
       character_response(responseData.data.film.characterConnection.characters);
       draw_table_characters();
+      planets_response(responseData.data.film.planetConnection.edges);
+      draw_table_planets();
     }         
   });
 }
@@ -142,6 +153,18 @@ function draw_table_vehicles(){
   cell1.innerHTML = "id";
   cell2.innerHTML = "name";
   cell3.innerHTML = "model";
+}
+
+function draw_table_planets(){
+  var row = tabla_planets.insertRow(0);
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell6 = row.insertCell(2);
+
+  // Add some text to the new cells:
+  cell1.innerHTML = "id";
+  cell2.innerHTML = "name";
 }
 
 
@@ -268,6 +291,27 @@ async function vehicles_response(result){
 }
 
 
+async function planets_response(result){
+  for(var res in result){
+    try{
+      var row = tabla_planets.insertRow(0);
+      // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell6 = row.insertCell(2);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = result[res].node.id;
+      cell2.innerHTML = result[res].node.name;
+      cell6.innerHTML = "VER MAS";
+    }
+    catch(e){
+      name.innerText += " "+ e;
+    }
+  }
+}
+
+
 
 
 async function ver_mas_species(){
@@ -344,6 +388,24 @@ async function ver_mas_vehicles(){
   }
 }
 
+async function ver_mas_planets(){
+  var index, table = tabla_planets;
+  for(var i  = 0; i < table.rows.length; i++){
+    try{
+      table.rows[i].cells[2].onclick = function(){
+        index = this.parentElement.rowIndex;
+        index = table.rows[index].cells[0].innerHTML 
+        console.log(index);    
+        window.location = "/planets/" +index;
+      };
+    }
+    catch(e){
+      console.log(e);
+    }
+
+  }
+}
+
 async function main(){
   search.placeholder="LOADING..."
   search.readOnly = true;
@@ -353,6 +415,7 @@ async function main(){
   await ver_mas_characters();
   await ver_mas_starships();
   await ver_mas_vehicles();
+  await ver_mas_planets();
   search.readOnly = false;
   search.placeholder="Search..";
 }

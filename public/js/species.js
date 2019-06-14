@@ -86,14 +86,10 @@ function draw_table_characters(){
   // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
-  var cell3 = row.insertCell(2);
-  var cell4 = row.insertCell(3);
-  var cell6 = row.insertCell(4);
+  var cell6 = row.insertCell(2);
   // Add some text to the new cells:
   cell1.innerHTML = "id";
   cell2.innerHTML = "name";
-  cell3.innerHTML = "birth Year";
-  cell4.innerHTML = "mass";
 }
 
 async function character_response(result){
@@ -103,20 +99,11 @@ async function character_response(result){
       // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
-      var cell6 = row.insertCell(4);
+      var cell6 = row.insertCell(2);
 
       // Add some text to the new cells:
       cell1.innerHTML = result[res].id;
       cell2.innerHTML = result[res].name;
-      cell3.innerHTML = result[res].birthYear;
-      if(result[res].mass == null){
-        cell4.innerHTML = "unknown";
-      }
-      else{
-        cell4.innerHTML = result[res].mass;
-      }
       cell6.innerHTML = "VER MAS";
     }
     catch(e){
@@ -131,7 +118,7 @@ async function ver_mas_people(){
   var index, table = tabla_characters;
   for(var i  = 0; i < table.rows.length; i++){
     try{
-      table.rows[i].cells[4].onclick = function(){
+      table.rows[i].cells[2].onclick = function(){
         index = this.parentElement.rowIndex;
         index = table.rows[index].cells[0].innerHTML 
         console.log(index);    
